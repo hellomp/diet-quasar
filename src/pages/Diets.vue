@@ -62,28 +62,28 @@
             <div class="col-6">
               <q-input
                 outlined
-                v-model="newDiet.energy.target"
+                v-model="newDiet.energy.target.kcal"
                 label="Energia (kcal)"
               />
             </div>
             <div class="col-6">
               <q-input
                 outlined
-                v-model="newDiet.carbohydrate.target"
+                v-model="newDiet.carbohydrate.target.kcal"
                 label="Carboidrato (g)"
               />
             </div>
             <div class="col-6">
               <q-input
                 outlined
-                v-model="newDiet.protein.target"
+                v-model="newDiet.protein.target.kcal"
                 label="Proteína (g)"
               />
             </div>
             <div class="col-6">
               <q-input
                 outlined
-                v-model="newDiet.lipid.target"
+                v-model="newDiet.lipid.target.kcal"
                 label="Lipídeo (g)"
               />
             </div>

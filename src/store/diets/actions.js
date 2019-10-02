@@ -1,14 +1,14 @@
 import fs from 'fs'
 import { remote } from 'electron'
 const dietsPath = remote.app.getPath('userData') + '/diets.json'
-export function setDiets ({ commit }) {
+export function setDiets ({ commit, state }) {
   fs.readFile(dietsPath, 'utf-8', (err, data) => {
     if (err == null) {
       console.log('File found')
       commit('SET_DIETS', JSON.parse(data))
     } else if (err.code === 'ENOENT') {
       console.log('Create file')
-      fs.writeFile(dietsPath, JSON.stringify(this.state.diets), 'utf-8', (err) => {
+      fs.writeFile(dietsPath, JSON.stringify(state.diets), 'utf-8', (err) => {
         if (err) throw err
       })
     } else {

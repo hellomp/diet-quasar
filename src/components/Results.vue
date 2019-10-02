@@ -16,11 +16,11 @@
       <span class="subtitle">Energia</span>
       <div class="results">
         <div class="result">
-          <span>{{diet.energyTotal}} kcal</span>
+          <span>{{diet.energy.total.kcal}} kcal</span>
         </div>
-        <div class="adequation positive">{{diet.energyAdequation}}%</div>
+        <div class="adequation positive">{{diet.energy.adequation}}%</div>
         <div class="result">
-          <span>{{diet.energyTarget}} kcal</span>
+          <span>{{diet.energy.target.kcal}} kcal</span>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
         </div>
         <div class="adequation positive">{{diet.carbohydrateAdequation}}%</div>
         <div class="result">
-          <span>{{diet.carbohydrateTarget}} kcal</span>
+          <span>{{diet.carbohydrate.target.kcal}} kcal</span>
           <span>{{diet.carbohydrateTargetPerc}}%</span>
           <span>{{diet.carbohydrateTarget}} g/kg</span>
         </div>

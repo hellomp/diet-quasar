@@ -18,7 +18,7 @@
         map-options
         use-chips
         stack-label
-        :options="columns"
+        :options="getColumns"
         option-value="name"
         style="width: 100%"
         label="Nutrientes"
@@ -27,7 +27,7 @@
         v-for="(meal, mealIndex) in diet.meals"
         :key="meal.id"
         :data="meal.items"
-        :columns="columns"
+        :columns="getColumns"
         :visible-columns="diet.visibleColumns"
         row-key="item_id"
         class="my-sticky-header-column-table"
@@ -70,148 +70,11 @@
               >
             </q-td>
             <q-td
-              key="energy"
+              v-for="column in getColumnsFilter"
+              :key="column.name"
               :props="props"
             >
-              {{props.row.energy}}
-            </q-td>
-            <q-td
-              key="carbohydrate"
-              :props="props"
-            >
-              {{props.row.carbohydrate}}
-            </q-td>
-            <q-td
-              key="protein"
-              :props="props"
-            >
-              {{props.row.protein}}
-            </q-td>
-            <q-td
-              key="lipid"
-              :props="props"
-            >
-              {{props.row.lipid}}
-            </q-td>
-            <q-td
-              key="fiber"
-              :props="props"
-            >
-              {{props.row.fiber}}
-            </q-td>
-            <q-td
-              key="sodium"
-              :props="props"
-            >
-              {{props.row.sodium}}
-            </q-td>
-            <q-td
-              key="iron"
-              :props="props"
-            >
-              {{props.row.iron}}
-            </q-td>
-            <q-td
-              key="fatty_acids_poly"
-              :props="props"
-            >
-              {{props.row.fatty_acids_poly}}
-            </q-td>
-            <q-td
-              key="fatty_acids_mono"
-              :props="props"
-            >
-              {{props.row.fatty_acids_mono}}
-            </q-td>
-            <q-td
-              key="fatty_acids_sat"
-              :props="props"
-            >
-              {{props.row.fatty_acids_sat}}
-            </q-td>
-            <q-td
-              key="cholesterol"
-              :props="props"
-            >
-              {{props.row.cholesterol}}
-            </q-td>
-            <q-td
-              key="re"
-              :props="props"
-            >
-              {{props.row.re}}
-            </q-td>
-            <q-td
-              key="vitamin_C"
-              :props="props"
-            >
-              {{props.row.vitamin_C}}
-            </q-td>
-            <q-td
-              key="thiamine"
-              :props="props"
-            >
-              {{props.row.thiamine}}
-            </q-td>
-            <q-td
-              key="riboflavin"
-              :props="props"
-            >
-              {{props.row.riboflavin}}
-            </q-td>
-            <q-td
-              key="pyridoxine"
-              :props="props"
-            >
-              {{props.row.pyridoxine}}
-            </q-td>
-            <q-td
-              key="niacin"
-              :props="props"
-            >
-              {{props.row.niacin}}
-            </q-td>
-            <q-td
-              key="calcium"
-              :props="props"
-            >
-              {{props.row.calcium}}
-            </q-td>
-            <q-td
-              key="manganese"
-              :props="props"
-            >
-              {{props.row.manganese}}
-            </q-td>
-            <q-td
-              key="zinc"
-              :props="props"
-            >
-              {{props.row.zinc}}
-            </q-td>
-            <q-td
-              key="magnesium"
-              :props="props"
-            >
-              {{props.row.magnesium}}
-            </q-td>
-            <q-td
-              key="potassium"
-              :props="props"
-            >
-              {{props.row.potassium}}
-            </q-td>
-            <q-td
-              key="phosphorus"
-              :props="props"
-            >
-              {{props.row.phosphorus}}
-            </q-td>
-            <q-td
-              key="copper"
-              :props="props"
-            >
-              {{props.row.copper}}
+              {{props.row[column.name].actual}}
             </q-td>
           </q-tr>
         </template>
@@ -245,7 +108,7 @@
       <q-table
         title="Alimentos"
         :data="getTucunduva"
-        :columns="columns"
+        :columns="getColumns"
         :visible-columns="diet.visibleColumns"
         row-key="id"
         class="my-sticky-header-column-table"
@@ -295,78 +158,7 @@ export default {
   },
   data () {
     return {
-      diet: {
-      },
-      columns: [
-        {
-          name: 'description',
-          label: 'Descrição',
-          required: true,
-          align: 'left',
-          field: row => row.description,
-          format: val => `${val}`,
-          sortable: true
-        },
-        { name: 'qty', label: 'Quant', field: row => row.qty },
-        { name: 'energy', label: 'Energia', field: row => row.energy },
-        { name: 'carbohydrate', label: 'Carb', field: row => row.carbohydrate, sortable: true },
-        { name: 'protein', label: 'Prot', field: row => row.protein, sortable: true },
-        { name: 'lipid', label: 'Lip', field: row => row.lipid },
-        { name: 'fiber', label: 'Fibra', field: row => row.fiber },
-        { name: 'sodium', label: 'Sódio', field: row => row.sodium },
-        { name: 'fatty_acids_poly', label: 'Á.G. Poli', field: row => row.fatty_acids_poly },
-        { name: 'fatty_acids_mono', label: 'Á.G. Mono', field: row => row.fatty_acids_mono },
-        { name: 'fatty_acids_sat', label: 'Á.G. Satu', field: row => row.fatty_acids_sat },
-        { name: 'cholesterol', label: 'Colesterol', field: row => row.cholesterol },
-        { name: 're', label: 'Retinol', field: row => row.re },
-        { name: 'vitamin_C', label: 'Á. Ascorbico (C)', field: row => row.vitamin_C },
-        { name: 'thiamine', label: 'Tiamina (B1)', field: row => row.thiamine },
-        { name: 'riboflavin', label: 'Riboflavina (B2)', field: row => row.riboflavin },
-        { name: 'pyridoxine', label: 'Piriroxina (B6)', field: row => row.pyridoxine },
-        { name: 'niacin', label: 'Niacina (B3)', field: row => row.niacin },
-        { name: 'calcium', label: 'Cálcio', field: row => row.calcium },
-        { name: 'manganese', label: 'Manganês', field: row => row.manganese },
-        { name: 'zinc', label: 'Zinco', field: row => row.zinc },
-        { name: 'magnesium', label: 'Magnésio', field: row => row.magnesium },
-        { name: 'potassium', label: 'Potássio', field: row => row.potassium },
-        { name: 'phosphorus', label: 'Fósforo', field: row => row.phosphorus },
-        { name: 'copper', label: 'Cobre', field: row => row.copper }
-      ],
-      compositionColumns: [
-        {
-          name: 'description',
-          label: 'Descrição',
-          required: true,
-          align: 'left',
-          field: row => row.description,
-          format: val => `${val}`,
-          sortable: true
-        },
-        { name: 'energy', label: 'Energia', field: row => row.energy },
-        { name: 'carbohydrate', label: 'Carb', field: row => row.carbohydrate, sortable: true },
-        { name: 'protein', label: 'Prot', field: row => row.protein, sortable: true },
-        { name: 'lipid', label: 'Lip', field: row => row.lipid },
-        { name: 'fiber', label: 'Fibra', field: row => row.fiber },
-        { name: 'sodium', label: 'Sódio', field: row => row.sodium },
-        { name: 'iron', label: 'Ferro', field: row => row.iron },
-        { name: 'fatty_acids_poly', label: 'Á.G. Poli', field: row => row.fatty_acids_poly },
-        { name: 'fatty_acids_mono', label: 'Á.G. Mono', field: row => row.fatty_acids_mono },
-        { name: 'fatty_acids_sat', label: 'Á.G. Satu', field: row => row.fatty_acids_sat },
-        { name: 'cholesterol', label: 'Colesterol', field: row => row.cholesterol },
-        { name: 're', label: 'Retinol', field: row => row.re },
-        { name: 'vitamin_C', label: 'Á. Ascorbico (C)', field: row => row.vitamin_C },
-        { name: 'thiamine', label: 'Tiamina (B1)', field: row => row.thiamine },
-        { name: 'riboflavin', label: 'Riboflavina (B2)', field: row => row.riboflavin },
-        { name: 'pyridoxine', label: 'Piriroxina (B6)', field: row => row.pyridoxine },
-        { name: 'niacin', label: 'Niacina (B3)', field: row => row.niacin },
-        { name: 'calcium', label: 'Cálcio', field: row => row.calcium },
-        { name: 'manganese', label: 'Manganês', field: row => row.manganese },
-        { name: 'zinc', label: 'Zinco', field: row => row.zinc },
-        { name: 'magnesium', label: 'Magnésio', field: row => row.magnesium },
-        { name: 'potassium', label: 'Potássio', field: row => row.potassium },
-        { name: 'phosphorus', label: 'Fósforo', field: row => row.phosphorus },
-        { name: 'copper', label: 'Cobre', field: row => row.copper }
-      ],
+      diet: {},
       selectedItems: [],
       selectedNewItems: [],
       selectedMealIndex: 0,
@@ -381,7 +173,19 @@ export default {
       this.diet.meals.push({
         id: uniqid(),
         name: 'Refeição',
-        items: []
+        items: [],
+        energy: {
+          total: 0
+        },
+        carbohydrate: {
+          total: 0
+        },
+        protein: {
+          total: 0
+        },
+        lipid: {
+          total: 0
+        }
       })
     },
     openModal (mealIndex) {
@@ -502,228 +306,58 @@ export default {
       this.cancelModal()
       this.updateMealTotals(this.selectedMealIndex)
     },
-    totalColumn (mealId, column) {
-      switch (column) {
-        case 'description':
-          break
-        case 'qty':
-          return 'Quant'
-        case 'energy':
-          return this.diet.meals[mealId].energyTotal
-        case 'carbohydrate':
-          return this.diet.meals[mealId].carbohydrateTotal
-        case 'protein':
-          return this.diet.meals[mealId].proteinTotal
-        case 'lipid':
-          return this.diet.meals[mealId].lipidTotal
-        case 'fiber':
-          return this.diet.meals[mealId].fiberTotal
-        case 'iron':
-          return this.diet.meals[mealId].ironTotal
-        case 'sodium':
-          return this.diet.meals[mealId].sodiumTotal
-        case 'fatty_acids_poly':
-          return this.diet.meals[mealId].fatty_acids_polyTotal
-        case 'fatty_acids_mono':
-          return this.diet.meals[mealId].fatty_acids_monoTotal
-        case 'fatty_acids_sat':
-          return this.diet.meals[mealId].fatty_acids_satTotal
-        case 'cholesterol':
-          return this.diet.meals[mealId].cholesterolTotal
-        case 're':
-          return this.diet.meals[mealId].reTotal
-        case 'vitamin_C':
-          return this.diet.meals[mealId].vitamin_CTotal
-        case 'thiamine':
-          return this.diet.meals[mealId].thiamineTotal
-        case 'riboflavin':
-          return this.diet.meals[mealId].riboflavinTotal
-        case 'pyridoxine':
-          return this.diet.meals[mealId].pyridoxineTotal
-        case 'niacin':
-          return this.diet.meals[mealId].niacinTotal
-        case 'calcium':
-          return this.diet.meals[mealId].calciumTotal
-        case 'manganese':
-          return this.diet.meals[mealId].manganeseTotal
-        case 'zinc':
-          return this.diet.meals[mealId].zincTotal
-        case 'magnesium':
-          return this.diet.meals[mealId].magnesiumTotal
-        case 'potassium':
-          return this.diet.meals[mealId].potassiumTotal
-        case 'phosphorus':
-          return this.diet.meals[mealId].phosphorusTotal
-        case 'copper':
-          return this.diet.meals[mealId].copperTotal
-        default:
-          return ''
-      }
+    totalColumn (mealId, totalColumn) {
+      let totalValue = ''
+      this.getColumns.forEach(column => {
+        if (totalColumn === column.name && totalColumn !== 'description' && totalColumn !== 'qty') {
+          totalValue = this.diet.meals[mealId][totalColumn].total
+        }
+      })
+      return totalValue
     },
     updateQty (mealId, itemId) {
       let actualItemId = _.findIndex(this.diet.meals[mealId].items, { 'item_id': itemId })
       let baseQty = _.divide(this.diet.meals[mealId].items[actualItemId].qty, 100)
-      this.columns.forEach(column => {
-        switch (column.name) {
-          case 'energy':
-            this.diet.meals[mealId].items[actualItemId].energy = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].energyBase, baseQty), 2)
-            break
-          case 'carbohydrate':
-            this.diet.meals[mealId].items[actualItemId].carbohydrate = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].carbohydrateBase, baseQty), 2)
-            break
-          case 'protein':
-            this.diet.meals[mealId].items[actualItemId].protein = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].proteinBase, baseQty), 2)
-            break
-          case 'lipid':
-            this.diet.meals[mealId].items[actualItemId].lipid = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].lipidBase, baseQty), 2)
-            break
-          case 'fiber':
-            this.diet.meals[mealId].items[actualItemId].fiber = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].fiberBase, baseQty), 2)
-            break
-          case 'sodium':
-            this.diet.meals[mealId].items[actualItemId].sodium = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].sodiumBase, baseQty), 2)
-            break
-          case 'iron':
-            this.diet.meals[mealId].items[actualItemId].iron = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].ironBase, baseQty), 2)
-            break
-          case 'fatty_acids_poly':
-            this.diet.meals[mealId].items[actualItemId].fatty_acids_poly = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].fatty_acids_polyBase, baseQty), 2)
-            break
-          case 'fatty_acids_mono':
-            this.diet.meals[mealId].items[actualItemId].fatty_acids_mono = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].fatty_acids_monoBase, baseQty), 2)
-            break
-          case 'fatty_acids_sat':
-            this.diet.meals[mealId].items[actualItemId].fatty_acids_sat = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].fatty_acids_satBase, baseQty), 2)
-            break
-          case 'cholesterol':
-            this.diet.meals[mealId].items[actualItemId].cholesterol = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].cholesterolBase, baseQty), 2)
-            break
-          case 're':
-            this.diet.meals[mealId].items[actualItemId].re = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].reBase, baseQty), 2)
-            break
-          case 'vitamin_C':
-            this.diet.meals[mealId].items[actualItemId].vitamin_C = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].vitamin_CBase, baseQty), 2)
-            break
-          case 'thiamine':
-            this.diet.meals[mealId].items[actualItemId].thiamine = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].thiamineBase, baseQty), 2)
-            break
-          case 'riboflavin':
-            this.diet.meals[mealId].items[actualItemId].riboflavin = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].riboflavinBase, baseQty), 2)
-            break
-          case 'pyridoxine':
-            this.diet.meals[mealId].items[actualItemId].pyridoxine = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].pyridoxineBase, baseQty), 2)
-            break
-          case 'niacin':
-            this.diet.meals[mealId].items[actualItemId].niacin = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].niacinBase, baseQty), 2)
-            break
-          case 'calcium':
-            this.diet.meals[mealId].items[actualItemId].calcium = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].calciumBase, baseQty), 2)
-            break
-          case 'manganese':
-            this.diet.meals[mealId].items[actualItemId].manganese = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].manganeseBase, baseQty), 2)
-            break
-          case 'zinc':
-            this.diet.meals[mealId].items[actualItemId].zinc = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].zincBase, baseQty), 2)
-            break
-          case 'magnesium':
-            this.diet.meals[mealId].items[actualItemId].magnesium = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].magnesiumBase, baseQty), 2)
-            break
-          case 'potassium':
-            this.diet.meals[mealId].items[actualItemId].potassium = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].potassiumBase, baseQty), 2)
-            break
-          case 'phosphorus':
-            this.diet.meals[mealId].items[actualItemId].phosphorus = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].phosphorusBase, baseQty), 2)
-            break
-          case 'copper':
-            this.diet.meals[mealId].items[actualItemId].copper = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId].copperBase, baseQty), 2)
-            break
-        }
+      this.getColumnsFilter.forEach(column => {
+        this.diet.meals[mealId].items[actualItemId][column.name].actual = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId][column.name].base, baseQty), 2)
       })
       this.updateMealTotals(mealId)
     },
     updateMealTotals (mealId) {
-      this.columns.forEach(column => {
-        let values = _.sum(_.values(_.mapValues(this.diet.meals[mealId].items, column.name)))
-        switch (column.name) {
-          case 'description':
-            break
-          case 'qty':
-            break
-          case 'energy':
-            this.diet.meals[mealId].energyTotal = _.round(values, 2)
-            break
-          case 'carbohydrate':
-            this.diet.meals[mealId].carbohydrateTotal = _.round(values, 2)
-            break
-          case 'protein':
-            this.diet.meals[mealId].proteinTotal = _.round(values, 2)
-            break
-          case 'lipid':
-            this.diet.meals[mealId].lipidTotal = _.round(values, 2)
-            break
-          case 'fiber':
-            this.diet.meals[mealId].fiberTotal = _.round(values, 2)
-            break
-          case 'sodium':
-            this.diet.meals[mealId].sodiumTotal = _.round(values, 2)
-            break
-          case 'iron':
-            this.diet.meals[mealId].ironTotal = _.round(values, 2)
-            break
-        }
+      this.getColumnsFilter.forEach(column => {
+        let values = _.sum(_.values(_.mapValues(this.diet.meals[mealId].items, 'energy.actual')))
+        this.diet.meals[mealId][column.name].total = _.round(values, 2)
       })
       this.updateDietTotals()
     },
     updateDietTotals () {
-      this.columns.forEach(column => {
-        switch (column.name) {
-          case 'description':
-            break
-          case 'qty':
-            break
-          case 'energy':
-            this.diet.energyTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'energyTotal'))), 2)
-            break
-          case 'carbohydrate':
-            this.diet.carbohydrateTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'carbohydrateTotal'))), 2)
-            break
-          case 'protein':
-            this.diet.proteinTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'proteinTotal'))), 2)
-            break
-          case 'lipid':
-            this.diet.lipidTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'lipidTotal'))), 2)
-            break
-          case 'fiber':
-            this.diet.fiberTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'fiberTotal'))), 2)
-            break
-          case 'sodium':
-            this.diet.sodiumTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'sodiumTotal'))), 2)
-            break
-          case 'iron':
-            this.diet.ironTotal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'ironTotal'))), 2)
-            break
+      this.getColumnsFilter.forEach(column => {
+        if (column.name === 'energy') {
+          this.diet[column.name].total.kcal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'energy.total'))), 2)
+        } else {
+          this.diet[column.name].total.grams = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'energy.total'))), 2)
         }
       })
       this.updateDietEnergy()
     },
     updateDietEnergy () {
-      this.diet.carbohydrateTotalEnergy = _.round(_.multiply(this.diet.carbohydrateTotal, 4), 2)
-      this.diet.proteinTotalEnergy = _.round(_.multiply(this.diet.proteinTotal, 4), 2)
-      this.diet.lipidTotalEnergy = _.round(_.multiply(this.diet.lipidTotal, 9), 2)
+      this.diet.carbohydrate.total.kcal = _.round(_.multiply(this.diet.carbohydrate.total.grams, 4), 2)
+      this.diet.protein.total.kcal = _.round(_.multiply(this.diet.protein.total.grams, 4), 2)
+      this.diet.lipid.total.kcal = _.round(_.multiply(this.diet.lipid.total.grams, 9), 2)
       this.updateDietPercentage()
       this.updateAdequation()
     },
     updateDietPercentage () {
-      this.diet.carbohydrateTotalPerc = _.round(_.multiply(_.divide(this.diet.carbohydrateTotalEnergy, this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy), 100), 2)
-      console.log(this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy)
-      this.diet.proteinTotalPerc = _.round(_.multiply(_.divide(this.diet.proteinTotalEnergy, this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy), 100), 2)
-      this.diet.lipidTotalPerc = _.round(_.multiply(_.divide(this.diet.lipidTotalEnergy, this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy), 100), 2)
+      let totalMacroEnergy = this.diet.carbohydrate.total.kcal + this.diet.protein.total.kcal + this.diet.lipid.total.kcal
+      this.diet.carbohydrate.total.perc = _.round(_.multiply(_.divide(this.diet.carbohydrate.total.kcal, totalMacroEnergy), 100), 2)
+      this.diet.protein.total.perc = _.round(_.multiply(_.divide(this.diet.protein.total.kcal, totalMacroEnergy), 100), 2)
+      this.diet.lipid.total.perc = _.round(_.multiply(_.divide(this.diet.lipidTotalEnergy, this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy), 100), 2)
     },
     updateAdequation () {
-      this.diet.energyAdequation = _.round(_.multiply(_.divide(this.diet.energyTotal, this.diet.energyTarget), 100), 2)
-      this.diet.carbohydrateAdequation = _.round(_.multiply(_.divide(this.diet.carbohydrateTotal, this.diet.carbohydrateTarget), 100), 2)
-      this.diet.proteinAdequation = _.round(_.multiply(_.divide(this.diet.proteinTotal, this.diet.proteinTarget), 100), 2)
-      this.diet.lipidAdequation = _.round(_.multiply(_.divide(this.diet.lipidTotal, this.diet.lipidTarget), 100), 2)
+      this.diet.energy.adequation = _.round(_.multiply(_.divide(this.diet.energy.total.kcal, this.diet.energy.target.kcal), 100), 2)
+      this.diet.carbohydrate.adequation = _.round(_.multiply(_.divide(this.diet.carbohydrate.total.kcal, this.diet.carbohydrate.target.kcal), 100), 2)
+      this.diet.protein.adequation = _.round(_.multiply(_.divide(this.diet.protein.total.kcal, this.diet.protein.target.kcal), 100), 2)
+      this.diet.lipid.adequation = _.round(_.multiply(_.divide(this.diet.lipid.total.kcal, this.diet.lipid.target.kcal), 100), 2)
     },
     saveDiet () {
       // Primeira vez que a dieta é salva localmente
@@ -743,7 +377,7 @@ export default {
             return
           }
           this.diet.path = fileName
-          this.diet.lastUpdate = moment().format('ll')
+          this.diet.updated = moment().format('ll')
           // Escrever dieta na pasta escolhida
           fs.writeFile(fileName, JSON.stringify(this.diet), 'utf-8', (err) => {
             if (err) throw err
@@ -752,8 +386,8 @@ export default {
         })
         // Sobreescrever arquivo da dieta caso ele já exista
       } else {
-        this.diet.lastUpdate = moment().format('ll')
-        console.log(this.diet.lastUpdate)
+        this.diet.updated = moment().format('ll')
+        console.log(this.diet.updated)
         fs.writeFile(this.diet.path, JSON.stringify(this.diet), 'utf-8', (err) => {
           if (err) throw err
           this.updateDiet(this.diet)
@@ -769,7 +403,7 @@ export default {
     })
   },
   computed: {
-    ...mapGetters('composition', ['getTucunduva']),
+    ...mapGetters('composition', ['getTucunduva', 'getColumns', 'getColumnsFilter']),
     ...mapState('app', ['savingDiet', 'showResults'])
   },
   watch: {
