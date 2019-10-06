@@ -18,7 +18,7 @@
         map-options
         use-chips
         stack-label
-        :options="getColumns"
+        :options="getColumnsNoDescQty"
         option-value="name"
         style="width: 100%"
         label="Nutrientes"
@@ -70,19 +70,17 @@
               >
             </q-td>
             <q-td
-              v-for="column in getColumnsFilter"
+              v-for="column in getColumnsNoDescQty"
               :key="column.name"
               :props="props"
+              class="text-right"
             >
               {{props.row[column.name].actual}}
             </q-td>
           </q-tr>
         </template>
         <template v-slot:bottom-row="props">
-          <q-tr
-            class="disabled"
-            :props="props"
-          >
+          <q-tr :props="props">
             <q-td
               v-for="col in props.cols"
               :key="col.name"
@@ -108,7 +106,7 @@
       <q-table
         title="Alimentos"
         :data="getTucunduva"
-        :columns="getColumns"
+        :columns="getColumnsNoQty"
         :visible-columns="diet.visibleColumns"
         row-key="id"
         class="my-sticky-header-column-table"
@@ -136,8 +134,13 @@
             @click="addSelectedItems"
           />
         </template>
-
       </q-table>
+    </q-dialog>
+    <q-dialog
+      :value="showExportDialog"
+      @hide="toggleExportDialog()"
+    >
+      <exportView :diet='diet' />
     </q-dialog>
   </q-page>
 </template>
@@ -150,11 +153,13 @@ import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { remote } from 'electron'
 import results from '../components/Results.vue'
+import exportView from '../components/Export.vue'
 
 export default {
   name: 'Diet',
   components: {
-    results
+    results,
+    exportView
   },
   data () {
     return {
@@ -168,25 +173,16 @@ export default {
   },
   methods: {
     ...mapActions('diets', ['updateDiets', 'updateDiet']),
-    ...mapActions('app', ['setSavingDiet']),
+    ...mapActions('app', ['setSavingDiet', 'toggleExportDialog']),
     createMeal () {
-      this.diet.meals.push({
-        id: uniqid(),
-        name: 'Refeição',
-        items: [],
-        energy: {
-          total: 0
-        },
-        carbohydrate: {
-          total: 0
-        },
-        protein: {
-          total: 0
-        },
-        lipid: {
-          total: 0
-        }
+      let newMeal = {}
+      newMeal.id = uniqid()
+      newMeal.name = 'Refeição'
+      newMeal.items = []
+      this.getColumnsNoDescQty.forEach(column => {
+        newMeal[column.name] = { total: 0 }
       })
+      this.diet.meals.push(newMeal)
     },
     openModal (mealIndex) {
       this.addFoodDialog = true
@@ -198,110 +194,17 @@ export default {
     },
     addSelectedItems () {
       this.selectedNewItems.forEach(selectedNewItem => {
-        this.diet.meals[this.selectedMealIndex].items.push(
-          {
-            id: selectedNewItem.id,
-            item_id: uniqid(),
-            qty: 100,
-            description: selectedNewItem.description,
-            energy: {
-              actual: selectedNewItem.energy,
-              base: selectedNewItem.energy
-            },
-            carbohydrate: {
-              actual: selectedNewItem.carbohydrate,
-              base: selectedNewItem.carbohydrate
-            },
-            protein: {
-              actual: selectedNewItem.protein,
-              base: selectedNewItem.protein
-            },
-            lipid: {
-              actual: selectedNewItem.lipid,
-              base: selectedNewItem.lipid
-            },
-            fiber: {
-              actual: selectedNewItem.fiber,
-              base: selectedNewItem.fiber
-            },
-            sodium: {
-              actual: selectedNewItem.sodium,
-              base: selectedNewItem.sodium
-            },
-            iron: {
-              actual: selectedNewItem.iron,
-              base: selectedNewItem.iron
-            },
-            fatty_acids_poly: {
-              actual: selectedNewItem.fatty_acids_poly,
-              base: selectedNewItem.fatty_acids_poly
-            },
-            fatty_acids_mono: {
-              actual: selectedNewItem.fatty_acids_mono,
-              base: selectedNewItem.fatty_acids_mono
-            },
-            fatty_acids_sat: {
-              actual: selectedNewItem.fatty_acids_sat,
-              base: selectedNewItem.fatty_acids_sat
-            },
-            cholesterol: {
-              actual: selectedNewItem.cholesterol,
-              base: selectedNewItem.cholesterol
-            },
-            re: {
-              actual: selectedNewItem.re,
-              base: selectedNewItem.re
-            },
-            vitamin_C: {
-              actual: selectedNewItem.vitamin_C,
-              base: selectedNewItem.vitamin_C
-            },
-            thiamine: {
-              actual: selectedNewItem.thiamine,
-              base: selectedNewItem.thiamine
-            },
-            riboflavin: {
-              actual: selectedNewItem.riboflavin,
-              base: selectedNewItem.riboflavin
-            },
-            pyridoxine: {
-              actual: selectedNewItem.pyridoxine,
-              base: selectedNewItem.pyridoxine
-            },
-            niacin: {
-              actual: selectedNewItem.niacin,
-              base: selectedNewItem.niacin
-            },
-            calcium: {
-              actual: selectedNewItem.calcium,
-              base: selectedNewItem.calcium
-            },
-            manganese: {
-              actual: selectedNewItem.manganese,
-              base: selectedNewItem.manganese
-            },
-            zinc: {
-              actual: selectedNewItem.zinc,
-              base: selectedNewItem.zinc
-            },
-            magnesium: {
-              actual: selectedNewItem.magnesium,
-              base: selectedNewItem.magnesium
-            },
-            potassium: {
-              actual: selectedNewItem.potassium,
-              base: selectedNewItem.potassium
-            },
-            phosphorus: {
-              actual: selectedNewItem.phosphorus,
-              base: selectedNewItem.phosphorus
-            },
-            copper: {
-              actual: selectedNewItem.copper,
-              base: selectedNewItem.copper
-            }
-          }
-        )
+        let newItem = {}
+        newItem.id = selectedNewItem.id
+        newItem.item_id = uniqid()
+        newItem.qty = 100
+        newItem.description = selectedNewItem.description
+        this.getColumnsNoDescQty.forEach(column => {
+          newItem[column.name] = { actual: 0, base: 0 }
+          newItem[column.name].actual = selectedNewItem[column.name]
+          newItem[column.name].base = selectedNewItem[column.name]
+        })
+        this.diet.meals[this.selectedMealIndex].items.push(newItem)
       })
       this.cancelModal()
       this.updateMealTotals(this.selectedMealIndex)
@@ -309,7 +212,9 @@ export default {
     totalColumn (mealId, totalColumn) {
       let totalValue = ''
       this.getColumns.forEach(column => {
-        if (totalColumn === column.name && totalColumn !== 'description' && totalColumn !== 'qty') {
+        if (totalColumn === 'description') {
+          totalValue = 'Total'
+        } else if (totalColumn === column.name && totalColumn !== 'qty') {
           totalValue = this.diet.meals[mealId][totalColumn].total
         }
       })
@@ -318,24 +223,25 @@ export default {
     updateQty (mealId, itemId) {
       let actualItemId = _.findIndex(this.diet.meals[mealId].items, { 'item_id': itemId })
       let baseQty = _.divide(this.diet.meals[mealId].items[actualItemId].qty, 100)
-      this.getColumnsFilter.forEach(column => {
+      this.getColumnsNoDescQty.forEach(column => {
         this.diet.meals[mealId].items[actualItemId][column.name].actual = _.round(_.multiply(this.diet.meals[mealId].items[actualItemId][column.name].base, baseQty), 2)
       })
       this.updateMealTotals(mealId)
     },
     updateMealTotals (mealId) {
-      this.getColumnsFilter.forEach(column => {
-        let values = _.sum(_.values(_.mapValues(this.diet.meals[mealId].items, 'energy.actual')))
+      this.getColumnsNoDescQty.forEach(column => {
+        let values = _.sum(_.values(_.mapValues(this.diet.meals[mealId].items, [column.name] + '.actual')))
+        console.log(values)
         this.diet.meals[mealId][column.name].total = _.round(values, 2)
       })
       this.updateDietTotals()
     },
     updateDietTotals () {
-      this.getColumnsFilter.forEach(column => {
+      this.getColumnsNoDescQty.forEach(column => {
         if (column.name === 'energy') {
           this.diet[column.name].total.kcal = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'energy.total'))), 2)
         } else {
-          this.diet[column.name].total.grams = _.round(_.sum(_.values(_.mapValues(this.diet.meals, 'energy.total'))), 2)
+          this.diet[column.name].total.grams = _.round(_.sum(_.values(_.mapValues(this.diet.meals, [column.name] + '.total'))), 2)
         }
       })
       this.updateDietEnergy()
@@ -351,7 +257,7 @@ export default {
       let totalMacroEnergy = this.diet.carbohydrate.total.kcal + this.diet.protein.total.kcal + this.diet.lipid.total.kcal
       this.diet.carbohydrate.total.perc = _.round(_.multiply(_.divide(this.diet.carbohydrate.total.kcal, totalMacroEnergy), 100), 2)
       this.diet.protein.total.perc = _.round(_.multiply(_.divide(this.diet.protein.total.kcal, totalMacroEnergy), 100), 2)
-      this.diet.lipid.total.perc = _.round(_.multiply(_.divide(this.diet.lipidTotalEnergy, this.diet.carbohydrateTotalEnergy + this.diet.proteinTotalEnergy + this.diet.lipidTotalEnergy), 100), 2)
+      this.diet.lipid.total.perc = _.round(_.multiply(_.divide(this.diet.lipid.total.kcal, totalMacroEnergy), 100), 2)
     },
     updateAdequation () {
       this.diet.energy.adequation = _.round(_.multiply(_.divide(this.diet.energy.total.kcal, this.diet.energy.target.kcal), 100), 2)
@@ -403,8 +309,8 @@ export default {
     })
   },
   computed: {
-    ...mapGetters('composition', ['getTucunduva', 'getColumns', 'getColumnsFilter']),
-    ...mapState('app', ['savingDiet', 'showResults'])
+    ...mapGetters('composition', ['getTucunduva', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),
+    ...mapState('app', ['savingDiet', 'showResults', 'showExportDialog'])
   },
   watch: {
     diet: {
@@ -425,16 +331,13 @@ export default {
 
 <style lang="scss">
 .my-sticky-header-column-table {
-  .q-table__middle {
-    //max-height: 200px;
-  }
-
   .q-table__top,
   .q-table__bottom,
-  tr:first-child th, /* bg color is important for th; just specify one */
+  th:first-child, /* bg color is important for th; just specify one */
   td:first-child {
     /* bg color is important for td; just specify one */
     background-color: #ffffff;
+    text-align: left !important;
   }
 
   tr:first-child th {

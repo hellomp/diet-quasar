@@ -9,368 +9,58 @@
         Calculado
       </div>
     </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('energy')"
-    >
-      <span class="subtitle">Energia</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.energy.total.kcal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.energy.adequation}}%</div>
-        <div class="result">
-          <span>{{diet.energy.target.kcal}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('carbohydrate')"
-    >
-      <span class="subtitle">Carboidrato</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.carbohydrateTotalEnergy}} kcal</span>
-          <span>{{diet.carbohydrateTotalPerc}}%</span>
-          <span>{{diet.carbohydrateTotal}} g/kg</span>
-        </div>
-        <div class="adequation positive">{{diet.carbohydrateAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.carbohydrate.target.kcal}} kcal</span>
-          <span>{{diet.carbohydrateTargetPerc}}%</span>
-          <span>{{diet.carbohydrateTarget}} g/kg</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('protein')"
-    >
-      <span class="subtitle">Proteína</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.proteinTotalEnergy}} kcal</span>
-          <span>{{diet.proteinTotalPerc}}%</span>
-          <span>{{diet.proteinTotal}} g/kg</span>
-        </div>
-        <div class="adequation positive">{{diet.proteinAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.proteinTarget}} kcal</span>
-          <span>{{diet.proteinTargetPerc}}%</span>
-          <span>{{diet.proteinTarget}} g/kg</span>
+    <template v-for="column in getColumnsNoDescQty">
+      <div
+        class="row"
+        v-if="checkVisibleColumn(column.name)"
+        :key="column.name"
+      >
+        <span class="subtitle">{{column.label}}</span>
+        <div class="results">
+          <div class="result">
+            <template v-if="column.name === 'energy'">
+              <span>{{diet[column.name].total.kcal}} kcal</span>
+            </template>
+            <template v-else-if="column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid'">
+              <span>{{diet[column.name].total.grams}} g</span>
+              <span>{{diet[column.name].total.kcal}} kcal</span>
+              <span>{{diet[column.name].total.perc}}%</span>
+            </template>
+            <template v-else>
+              <span>{{diet[column.name].total.grams}} {{column.unit}}</span>
+            </template>
+          </div>
+          <div
+            v-if="diet[column.name].adequation > 89.99 && diet[column.name].adequation < 110.01"
+            class="adequation positive"
+          >{{diet[column.name].adequation}}%</div>
+          <div
+            v-else
+            class="adequation negative"
+          >{{diet[column.name].adequation}}%</div>
+          <div class="result">
+            <template v-if="column.name === 'energy'">
+              <span>{{diet[column.name].target.kcal}} kcal</span>
+            </template>
+            <template v-else-if="column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid'">
+              <span>{{diet[column.name].target.grams}} g</span>
+              <span>{{diet[column.name].target.kcal}} kcal</span>
+              <span>{{diet[column.name].target.perc}}%</span>
+            </template>
+            <template v-else>
+              <span>{{diet[column.name].target.grams}} {{column.unit}}</span>
+            </template>
+          </div>
         </div>
       </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('lipid')"
-    >
-      <span class="subtitle">Lipídeo</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.lipidTotalEnergy}} kcal</span>
-          <span>{{diet.lipidTotalPerc}}%</span>
-          <span>{{diet.lipidTotal}} g/kg</span>
-        </div>
-        <div class="adequation positive">{{diet.lipidAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.lipidTarget}} kcal</span>
-          <span>{{diet.lipidTargetPerc}}%</span>
-          <span>{{diet.lipidTarget}} g/kg</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('fiber')"
-    >
-      <span class="subtitle">Fibra</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.fiberTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.fiberAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.fiberTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('sodium')"
-    >
-      <span class="subtitle">Sódio</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.sodiumTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.sodiumAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.sodiumTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('fatty_acids_poly')"
-    >
-      <span class="subtitle">Á.G. Poli.</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.fatty_acids_polyTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.fatty_acids_polyAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.fatty_acids_polyTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('fatty_acids_mono')"
-    >
-      <span class="subtitle">Á.G. Mono.</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.fatty_acids_monoTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.fatty_acids_monoAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.fatty_acids_monoTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('fatty_acids_sat')"
-    >
-      <span class="subtitle">Á.G. Sat.</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.fatty_acids_satTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.fatty_acids_satAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.fatty_acids_satTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('cholesterol')"
-    >
-      <span class="subtitle">Colesterol</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.cholesterolTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.cholesterolAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.cholesterolTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('re')"
-    >
-      <span class="subtitle">Retinol</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.reTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.reAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.reTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('vitamin_C')"
-    >
-      <span class="subtitle">Á. Ascórbico (C)</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.vitamin_CTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.vitamin_CAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.vitamin_CTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('thiamine')"
-    >
-      <span class="subtitle">Tiamina</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.thiamineTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.thiamineAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.thiamineTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('riboflavin')"
-    >
-      <span class="subtitle">Riboflavina</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.riboflavinTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.riboflavinAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.riboflavinTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('pyridoxine')"
-    >
-      <span class="subtitle">Piridoxina</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.pyridoxineTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.pyridoxineAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.pyridoxineTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('niacin')"
-    >
-      <span class="subtitle">Niacina</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.niacinTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.niacinAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.niacinTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('calcium')"
-    >
-      <span class="subtitle">Cálcio</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.calciumTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.calciumAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.calciumTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('manganese')"
-    >
-      <span class="subtitle">Manganês</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.manganeseTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.manganeseAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.manganeseTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('zinc')"
-    >
-      <span class="subtitle">Zinco</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.zincTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.zincAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.zincTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('magnesium')"
-    >
-      <span class="subtitle">Magnésio</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.magnesiumTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.magnesiumAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.magnesiumTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('potassium')"
-    >
-      <span class="subtitle">Potássio</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.potassiumTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.potassiumAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.potassiumTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('phosphorus')"
-    >
-      <span class="subtitle">Fósforo</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.phosphorusTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.phosphorusAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.phosphorusTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
-    <div
-      class="row"
-      v-if="checkVisibleColumn('copper')"
-    >
-      <span class="subtitle">Cobre</span>
-      <div class="results">
-        <div class="result">
-          <span>{{diet.copperTotal}} kcal</span>
-        </div>
-        <div class="adequation positive">{{diet.copperAdequation}}%</div>
-        <div class="result">
-          <span>{{diet.copperTarget}} kcal</span>
-        </div>
-      </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'Results',
   props: ['diet'],
@@ -431,7 +121,7 @@ export default {
     } */
   },
   computed: {
-
+    ...mapGetters('composition', ['getColumnsNoDescQty'])
   }
 }
 </script>
@@ -494,5 +184,8 @@ export default {
 }
 .positive {
   background-color: #51c08a !important;
+}
+.negative {
+  background-color: #db4437 !important;
 }
 </style>

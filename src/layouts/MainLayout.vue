@@ -61,6 +61,17 @@
             Resultados
           </q-tooltip>
         </q-btn>
+        <q-btn
+          dense
+          flat
+          round
+          icon="description"
+          @click="toggleExportDialog"
+        >
+          <q-tooltip>
+            Exportar
+          </q-tooltip>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -122,7 +133,7 @@ export default {
   methods: {
     ...mapActions('composition', ['setTucunduva']),
     ...mapActions('diets', ['setDiets']),
-    ...mapActions('app', ['setSavingDiet', 'toggleResults']),
+    ...mapActions('app', ['setSavingDiet', 'toggleResults', 'toggleExportDialog']),
     saveDiet () {
       this.setSavingDiet(true)
     }

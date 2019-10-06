@@ -4,3 +4,6 @@ export function getSavingDiet (state) {
 export function getShowResults (state) {
   return state.showResults
 }
+export function getExportDialog (state) {
+  return state.showExportDialog
+}

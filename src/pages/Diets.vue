@@ -47,7 +47,7 @@
     <q-dialog v-model="newDietDialog">
       <q-card>
         <q-card-section>
-          <div class="text-h6">Nova newDietDialog</div>
+          <div class="text-h6">Nova dieta</div>
         </q-card-section>
 
         <q-card-section>
@@ -183,13 +183,14 @@ export default {
           adequation: 0
         },
         meals: [],
-        visibleColumns: ['description', 'qty', 'energy', 'carbohydrate', 'protein', 'lipid']
+        visibleColumns: ['energy', 'carbohydrate', 'protein', 'lipid']
       },
       newDietDialog: false
     }
   },
   computed: {
-    ...mapGetters('diets', ['getDiets'])
+    ...mapGetters('diets', ['getDiets']),
+    ...mapGetters('composition', ['getColumnsNoDescQty'])
   },
   methods: {
     openDiet (path) {
@@ -203,10 +204,13 @@ export default {
     createDiet () {
       this.newDiet.id = uniqid()
       this.newDiet.created = moment().format('ll')
-      this.newDiet.carbohydrate.target.perc = _.round(_.multiply(_.divide(this.newDiet.carbohydrate.target.kcal, this.newDiet.energy.target.kcal), 100), 2)
-      this.newDiet.protein.target.perc = _.round(_.multiply(_.divide(this.newDiet.protein.target.kcal, this.newDiet.energy.target.kcal), 100), 2)
-      this.newDiet.lipid.target.perc = _.round(_.multiply(_.divide(this.newDiet.lipid.target.kcal, this.newDiet.energy.target.kcal), 100), 2)
-
+      this.getColumnsNoDescQty.forEach(column => {
+        if (column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid') {
+          this.newDiet[column.name].target.perc = _.round(_.multiply(_.divide(this.newDiet[column.name].target.kcal, this.newDiet.energy.target.kcal), 100), 2)
+        } else if (column.name !== 'energy') {
+          this.newDiet[column.name] = { target: { grams: 0 }, total: { grams: 0 }, adequation: 0 }
+        }
+      })
       let newDietData = JSON.stringify(this.newDiet)
       let instance = this
       tmp.file({

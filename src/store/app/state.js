@@ -1,4 +1,5 @@
 export default {
   savingDiet: false,
-  showResults: true
+  showResults: true,
+  showExportDialog: false
 }

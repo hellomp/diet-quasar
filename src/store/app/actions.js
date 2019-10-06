@@ -4,3 +4,6 @@ export function setSavingDiet ({ commit }, value) {
 export function toggleResults ({ commit }) {
   commit('TOGGLE_RESULTS')
 }
+export function toggleExportDialog ({ commit }) {
+  commit('TOGGLE_EXPORT')
+}
