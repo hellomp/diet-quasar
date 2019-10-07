@@ -172,7 +172,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('diets', ['updateDiets', 'updateDiet']),
+    ...mapActions('diets', ['addDiet', 'updateDiet']),
     ...mapActions('app', ['setSavingDiet', 'toggleExportDialog']),
     createMeal () {
       let newMeal = {}
@@ -231,7 +231,6 @@ export default {
     updateMealTotals (mealId) {
       this.getColumnsNoDescQty.forEach(column => {
         let values = _.sum(_.values(_.mapValues(this.diet.meals[mealId].items, [column.name] + '.actual')))
-        console.log(values)
         this.diet.meals[mealId][column.name].total = _.round(values, 2)
       })
       this.updateDietTotals()
@@ -287,7 +286,7 @@ export default {
           // Escrever dieta na pasta escolhida
           fs.writeFile(fileName, JSON.stringify(this.diet), 'utf-8', (err) => {
             if (err) throw err
-            this.updateDiets(this.diet)
+            this.addDiet(this.diet)
           })
         })
         // Sobreescrever arquivo da dieta caso ele já exista
@@ -302,6 +301,7 @@ export default {
     }
   },
   created () {
+    // Pegar caminho do arquivo temporário da dieta criada
     fs.readFile(this.$route.params.dietPath, 'utf-8', (err, data) => {
       if (err) throw err
       this.diet = JSON.parse(data)

@@ -34,9 +34,6 @@
         />
 
         <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar>
           Diet Quasar
         </q-toolbar-title>
         <q-btn
@@ -102,6 +99,7 @@
         <q-item
           clickable
           v-ripple
+          to="/compositions"
           active
         >
           <q-item-section avatar>
@@ -109,6 +107,18 @@
           </q-item-section>
 
           <q-item-section>Composição</q-item-section>
+        </q-item>
+        <q-item
+          clickable
+          v-ripple
+          to="/calculator"
+          active
+        >
+          <q-item-section avatar>
+            <q-icon name="calculator" />
+          </q-item-section>
+
+          <q-item-section>Calculadora</q-item-section>
         </q-item>
       </q-list>
     </q-drawer>

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import fs from 'fs'
 import { remote } from 'electron'
 const dietsPath = remote.app.getPath('userData') + '/diets.json'
@@ -17,10 +18,10 @@ export function setDiets ({ commit, state }) {
   })
 }
 export function updateDiet ({ commit, state }, _diet) {
-  // Adicionar a dieta salva à lista de dietas do app
+  // Atualizar a dieta já salva na lista de dietas do app
   let diets = state.diets.slice()
   diets.forEach(diet => {
-    if (diet.id === _diet.id) {
+    if (diet.path === _diet.path) {
       diet.lastUpdate = _diet.lastUpdate
     }
   })
@@ -31,15 +32,19 @@ export function updateDiet ({ commit, state }, _diet) {
     commit('SET_DIETS', diets)
   })
 }
-export function updateDiets ({ commit, state }, diet) {
-  // Adicionar a dieta salva à lista de dietas do app
+export function addDiet ({ commit, state }, _diet) {
   let diets = state.diets.slice()
+  // Verificar se a dieta já existe na lista do app
+  if (_.includes(diets, _diet.path)) {
+    return
+  }
+  // Adicionar a dieta salva à lista de dietas do app
   let thisDiet = {
-    id: diet.id,
-    name: diet.name,
-    path: diet.path,
-    created: diet.created,
-    lastUpdate: diet.lastUpdate
+    id: _diet.id,
+    name: _diet.name,
+    path: _diet.path,
+    created: _diet.created,
+    updated: _diet.updated
   }
   diets.push(thisDiet)
   fs.writeFile(dietsPath, JSON.stringify(diets), 'utf-8', (err) => {

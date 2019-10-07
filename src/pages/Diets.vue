@@ -9,6 +9,7 @@
         <q-btn
           flat
           label="Abrir"
+          @click="openLocalDiet"
         />
       </template>
       <template v-slot:body="props">
@@ -29,7 +30,7 @@
             {{props.row.created}}
           </q-td>
           <q-td
-            key="lastUpdate"
+            key="updated"
             :props="props"
           >
             {{props.row.updated}}
@@ -51,7 +52,7 @@
         </q-card-section>
 
         <q-card-section>
-          <div class="row">
+          <div class="row q-col-gutter-xs">
             <div class="col-12">
               <q-input
                 outlined
@@ -116,7 +117,7 @@ import moment from 'moment'
 import uniqid from 'uniqid'
 import tmp from 'tmp'
 import fs from 'fs'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { remote } from 'electron'
 
 export default {
@@ -193,6 +194,8 @@ export default {
     ...mapGetters('composition', ['getColumnsNoDescQty'])
   },
   methods: {
+    ...mapActions('diets', ['addDiet']),
+    // Abrir dieta da lista de dietas salvas no aplicativo
     openDiet (path) {
       this.$router.push({
         name: 'diet',
@@ -201,9 +204,41 @@ export default {
         }
       })
     },
+    // Abrir dieta salva no computador e adicioná-la a lista do aplicativo
+    openLocalDiet () {
+      remote.dialog.showOpenDialog({
+        filters: [{
+          name: 'Diet files',
+          extensions: ['json']
+        },
+        {
+          name: 'All files',
+          extensions: ['*']
+        }],
+        properties: ['openFile']
+      }, (filePaths) => {
+        if (filePaths === undefined) {
+          return
+        }
+        // Adicionar dieta à lista do app
+        fs.readFile(filePaths[0], 'utf-8', (err, data) => {
+          if (err) throw err
+          this.addDiet(JSON.parse(data))
+          // Abrir dieta
+          this.$router.push({
+            name: 'diet',
+            params: {
+              dietPath: filePaths[0]
+            }
+          })
+        })
+      })
+    },
+    // Criar arquivo temporário da dieta e abri-la
     createDiet () {
       this.newDiet.id = uniqid()
       this.newDiet.created = moment().format('ll')
+      // Definir porcentagem de cada macro na energia total e declarar as variáveis dos micro
       this.getColumnsNoDescQty.forEach(column => {
         if (column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid') {
           this.newDiet[column.name].target.perc = _.round(_.multiply(_.divide(this.newDiet[column.name].target.kcal, this.newDiet.energy.target.kcal), 100), 2)
@@ -217,8 +252,6 @@ export default {
         dir: remote.app.getPath('temp')
       }, function _tempFileCreated (err, path, fd, cleanupCallback) {
         if (err) throw err
-        console.log('File: ', path)
-        console.log('Filedescriptor: ', fd)
         fs.writeFile(path, newDietData, 'utf-8', (err) => {
           if (err) throw err
           // instance.cancelModal()
