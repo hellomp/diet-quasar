@@ -29,7 +29,7 @@
           dense
           flat
           round
-          icon="menu"
+          icon="fas fa-bars"
           @click="left = !left"
         />
 
@@ -40,8 +40,9 @@
           dense
           flat
           round
-          icon="save"
+          icon="fas fa-save"
           @click.prevent="saveDiet"
+          style="font-size: 0.8em"
         >
           <q-tooltip>
             Salvar
@@ -51,8 +52,9 @@
           dense
           flat
           round
-          icon="visibility"
+          icon="fas fa-percentage"
           @click="toggleResults"
+          style="font-size: 0.8em"
         >
           <q-tooltip>
             Resultados
@@ -62,8 +64,9 @@
           dense
           flat
           round
-          icon="description"
+          icon="fas fa-file-export"
           @click="toggleExportDialog"
+          style="font-size: 0.7em"
         >
           <q-tooltip>
             Exportar
@@ -91,7 +94,7 @@
           active
         >
           <q-item-section avatar>
-            <q-icon name="local_dining" />
+            <q-icon name="fas fa-utensils" />
           </q-item-section>
 
           <q-item-section>Dietas</q-item-section>
@@ -103,7 +106,7 @@
           active
         >
           <q-item-section avatar>
-            <q-icon name="view_list" />
+            <q-icon name="fas fa-table" />
           </q-item-section>
 
           <q-item-section>Composição</q-item-section>
@@ -115,7 +118,7 @@
           active
         >
           <q-item-section avatar>
-            <q-icon name="calculator" />
+            <q-icon name="fas fa-calculator" />
           </q-item-section>
 
           <q-item-section>Calculadora</q-item-section>
@@ -141,7 +144,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('composition', ['setTucunduva']),
+    ...mapActions('composition', ['setTucunduva', 'setDRIs']),
     ...mapActions('diets', ['setDiets']),
     ...mapActions('app', ['setSavingDiet', 'toggleResults', 'toggleExportDialog']),
     saveDiet () {
@@ -150,6 +153,7 @@ export default {
   },
   created () {
     this.setTucunduva()
+    this.setDRIs()
     this.setDiets()
   }
 }

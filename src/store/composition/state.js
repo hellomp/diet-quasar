@@ -1,5 +1,6 @@
 export default {
   tucunduva: [],
+  dris: {},
   columns: [
     {
       name: 'description',

@@ -2,6 +2,9 @@ export function getTucunduva (state) {
   console.log('3. Get taco database')
   return state.tucunduva
 }
+export function getDRIs (state) {
+  return state.dris
+}
 export function getColumns (state) {
   return state.columns
 }

@@ -31,6 +31,8 @@
         :visible-columns="diet.visibleColumns"
         row-key="item_id"
         class="my-sticky-header-column-table"
+        table-class="syncscroll"
+        name="table"
         :myvalue="mealIndex"
         hide-bottom
       >
@@ -168,7 +170,17 @@ export default {
       selectedNewItems: [],
       selectedMealIndex: 0,
       addFoodDialog: false,
-      searchString: null
+      searchString: null,
+      sexOptions: [
+        {
+          value: 'male',
+          label: 'Masculino'
+        },
+        {
+          value: 'female',
+          label: 'Feminino'
+        }
+      ]
     }
   },
   methods: {
@@ -183,6 +195,10 @@ export default {
         newMeal[column.name] = { total: 0 }
       })
       this.diet.meals.push(newMeal)
+      let scrolls = document.querySelectorAll('.syncscroll')
+      scrolls.forEach(scroll => {
+        scroll.setAttribute('name', 'tablescroll')
+      })
     },
     openModal (mealIndex) {
       this.addFoodDialog = true
@@ -259,10 +275,44 @@ export default {
       this.diet.lipid.total.perc = _.round(_.multiply(_.divide(this.diet.lipid.total.kcal, totalMacroEnergy), 100), 2)
     },
     updateAdequation () {
-      this.diet.energy.adequation = _.round(_.multiply(_.divide(this.diet.energy.total.kcal, this.diet.energy.target.kcal), 100), 2)
-      this.diet.carbohydrate.adequation = _.round(_.multiply(_.divide(this.diet.carbohydrate.total.kcal, this.diet.carbohydrate.target.kcal), 100), 2)
-      this.diet.protein.adequation = _.round(_.multiply(_.divide(this.diet.protein.total.kcal, this.diet.protein.target.kcal), 100), 2)
-      this.diet.lipid.adequation = _.round(_.multiply(_.divide(this.diet.lipid.total.kcal, this.diet.lipid.target.kcal), 100), 2)
+      this.getColumnsNoDescQty.forEach(column => {
+        if (column.name === 'energy' || column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid') {
+          this.diet[column.name].adequation = _.round(_.multiply(_.divide(this.diet[column.name].total.kcal, this.diet[column.name].target.kcal), 100), 2)
+        } else {
+          this.diet[column.name].adequation = _.round(_.multiply(_.divide(this.diet[column.name].total.grams, this.diet[column.name].target.grams), 100), 2)
+        }
+      })
+      /*  this.diet.carbohydrate.adequation = _.round(_.multiply(_.divide(this.diet.carbohydrate.total.kcal, this.diet.carbohydrate.target.kcal), 100), 2)
+       this.diet.protein.adequation = _.round(_.multiply(_.divide(this.diet.protein.total.kcal, this.diet.protein.target.kcal), 100), 2)
+       this.diet.lipid.adequation = _.round(_.multiply(_.divide(this.diet.lipid.total.kcal, this.diet.lipid.target.kcal), 100), 2) */
+    },
+    updateDRI () {
+      let age = this.diet.patient.age
+      let sex = this.diet.patient.sex
+      this.getColumnsNoDescQty.forEach(column => {
+        if (column.name === 'energy' || column.name === 'carbohydrate' || column.name === 'protein' || column.name === 'lipid') {
+          return
+        }
+        if (age === 0) {
+          this.diet[column.name].target.grams = this.getDRIs[sex]._zero[column.name]
+        } else if (age >= 1 && age <= 3) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].one_three[column.name]
+        } else if (age >= 4 && age <= 8) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].four_eight[column.name]
+        } else if (age >= 9 && age <= 13) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].nine_thirteen[column.name]
+        } else if (age >= 14 && age <= 18) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].fourteen_eighteen[column.name]
+        } else if (age >= 19 && age <= 30) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].nineteen_thirty[column.name]
+        } else if (age >= 31 && age <= 50) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].thirtyOne_fifty[column.name]
+        } else if (age >= 51 && age <= 70) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].fiftyOne_seventy[column.name]
+        } else if (age >= 71) {
+          this.diet[column.name].target.grams = this.getDRIs[sex].seventy_[column.name]
+        }
+      })
     },
     saveDiet () {
       // Primeira vez que a dieta é salva localmente
@@ -305,11 +355,12 @@ export default {
     fs.readFile(this.$route.params.dietPath, 'utf-8', (err, data) => {
       if (err) throw err
       this.diet = JSON.parse(data)
+      this.updateDRI()
       console.log('Read new diet')
     })
   },
   computed: {
-    ...mapGetters('composition', ['getTucunduva', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),
+    ...mapGetters('composition', ['getTucunduva', 'getDRIs', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),
     ...mapState('app', ['savingDiet', 'showResults', 'showExportDialog'])
   },
   watch: {

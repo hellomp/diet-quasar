@@ -88,6 +88,30 @@
                 label="Lipídeo (g)"
               />
             </div>
+            <div class="col-6">
+              <q-input
+                outlined
+                v-model="newDiet.patient.weight"
+                label="Peso (kg)"
+              />
+            </div>
+            <div class="col-6">
+              <q-input
+                outlined
+                v-model="newDiet.patient.age"
+                label="Idade"
+              />
+            </div>
+            <div class="col-6">
+              <q-select
+                :options="sexOptions"
+                outlined
+                v-model="newDiet.patient.sex"
+                label="Sexo"
+                emit-value
+                map-options
+              />
+            </div>
           </div>
         </q-card-section>
 
@@ -129,12 +153,27 @@ export default {
         { name: 'created', label: 'Criado em', field: 'created', sortable: true },
         { name: 'updated', label: 'Última atualização', field: 'updated', sortable: true }
       ],
+      sexOptions: [
+        {
+          value: 'male',
+          label: 'Masculino'
+        },
+        {
+          value: 'female',
+          label: 'Feminino'
+        }
+      ],
       newDiet: {
         id: null,
         name: '',
         path: '',
         created: null,
         updated: null,
+        patient: {
+          age: 0,
+          sex: 'male',
+          weight: 0
+        },
         energy: {
           target: {
             kcal: 0
