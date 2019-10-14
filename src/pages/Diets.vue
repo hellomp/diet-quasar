@@ -8,14 +8,15 @@
       <template v-slot:top-right="props">
         <q-btn
           flat
-          label="Abrir"
-          @click="openLocalDiet"
+          color="primary"
+          label="Nova dieta"
+          @click="newDietDialog = true"
         />
       </template>
       <template v-slot:body="props">
         <q-tr
           :props="props"
-          @click.native="openDiet(props.row.path)"
+          @click.native="openDiet(props.row.id)"
         >
           <q-td
             key="name"
@@ -38,13 +39,7 @@
         </q-tr>
       </template>
     </q-table>
-    <q-btn
-      rounded
-      color="primary"
-      icon="add"
-      label="Nova dieta"
-      @click="newDietDialog = true"
-    />
+
     <q-dialog v-model="newDietDialog">
       <q-card>
         <q-card-section>
@@ -137,12 +132,9 @@
 
 <script>
 import _ from 'lodash'
+import { db } from '../plugins/firebase'
 import moment from 'moment'
-import uniqid from 'uniqid'
-import tmp from 'tmp'
-import fs from 'fs'
 import { mapGetters, mapActions } from 'vuex'
-import { remote } from 'electron'
 
 export default {
   data () {
@@ -233,49 +225,18 @@ export default {
     ...mapGetters('composition', ['getColumnsNoDescQty'])
   },
   methods: {
-    ...mapActions('diets', ['addDiet']),
+    ...mapActions('diets', ['addDiet', 'setDiets']),
     // Abrir dieta da lista de dietas salvas no aplicativo
-    openDiet (path) {
+    openDiet (id) {
       this.$router.push({
         name: 'diet',
         params: {
-          dietPath: path
+          dietId: id
         }
-      })
-    },
-    // Abrir dieta salva no computador e adicioná-la a lista do aplicativo
-    openLocalDiet () {
-      remote.dialog.showOpenDialog({
-        filters: [{
-          name: 'Diet files',
-          extensions: ['json']
-        },
-        {
-          name: 'All files',
-          extensions: ['*']
-        }],
-        properties: ['openFile']
-      }, (filePaths) => {
-        if (filePaths === undefined) {
-          return
-        }
-        // Adicionar dieta à lista do app
-        fs.readFile(filePaths[0], 'utf-8', (err, data) => {
-          if (err) throw err
-          this.addDiet(JSON.parse(data))
-          // Abrir dieta
-          this.$router.push({
-            name: 'diet',
-            params: {
-              dietPath: filePaths[0]
-            }
-          })
-        })
       })
     },
     // Criar arquivo temporário da dieta e abri-la
     createDiet () {
-      this.newDiet.id = uniqid()
       this.newDiet.created = moment().format('ll')
       // Definir porcentagem de cada macro na energia total e declarar as variáveis dos micro
       this.getColumnsNoDescQty.forEach(column => {
@@ -285,7 +246,18 @@ export default {
           this.newDiet[column.name] = { target: { grams: 0 }, total: { grams: 0 }, adequation: 0 }
         }
       })
-      let newDietData = JSON.stringify(this.newDiet)
+      db.collection('diets').add(this.newDiet)
+        .then(docRef => {
+          this.$router.push({
+            name: 'diet',
+            params: {
+              dietId: docRef.id
+            }
+          })
+        }).catch(err => {
+          console.error('Error adding diet: ', err)
+        })
+      /* let newDietData = JSON.stringify(this.newDiet)
       let instance = this
       tmp.file({
         dir: remote.app.getPath('temp')
@@ -301,8 +273,11 @@ export default {
             }
           })
         })
-      })
+      }) */
     }
+  },
+  created () {
+    this.setDiets()
   }
 }
 </script>

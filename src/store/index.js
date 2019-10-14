@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+// Vuex store modules
 import composition from './composition'
 import diets from './diets'
 import app from './app'
-// import example from './module-example'
 
 Vue.use(Vuex)
 

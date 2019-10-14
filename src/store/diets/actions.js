@@ -1,9 +1,23 @@
 import _ from 'lodash'
 import fs from 'fs'
 import { remote } from 'electron'
+import { db } from '../../plugins/firebase'
 const dietsPath = remote.app.getPath('userData') + '/diets.json'
 export function setDiets ({ commit, state }) {
-  fs.readFile(dietsPath, 'utf-8', (err, data) => {
+  let diets = []
+  db.collection('diets').get()
+    .then(querySnapshot => {
+      querySnapshot.forEach(doc => {
+        let diet = {}
+        diet = doc.data()
+        diet.id = doc.id
+        diets.push(diet)
+      })
+      commit('SET_DIETS', diets)
+    }).catch(err => {
+      console.error(err)
+    })
+  /* .fs.readFile(dietsPath, 'utf-8', (err, data) => {
     if (err == null) {
       console.log('File found')
       commit('SET_DIETS', JSON.parse(data))
@@ -15,7 +29,7 @@ export function setDiets ({ commit, state }) {
     } else {
       console.log('Some other error: ', err.code)
     }
-  })
+  }) */
 }
 export function updateDiet ({ commit, state }, _diet) {
   // Atualizar a dieta já salva na lista de dietas do app

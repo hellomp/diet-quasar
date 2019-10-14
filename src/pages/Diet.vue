@@ -38,6 +38,7 @@
       >
         <template v-slot:top-left>
           <q-input
+            dense
             borderless
             debounce="100"
             v-model="meal.name"
@@ -149,11 +150,10 @@
 
 <script>
 import _ from 'lodash'
-import fs from 'fs'
+import { db } from '../plugins/firebase'
 import uniqid from 'uniqid'
 import moment from 'moment'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { remote } from 'electron'
 import results from '../components/Results.vue'
 import exportView from '../components/Export.vue'
 
@@ -294,29 +294,45 @@ export default {
           return
         }
         if (age === 0) {
-          this.diet[column.name].target.grams = this.getDRIs[sex]._zero[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, '_zero', column.name)
         } else if (age >= 1 && age <= 3) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].one_three[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'one_three', column.name)
         } else if (age >= 4 && age <= 8) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].four_eight[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'four_eight', column.name)
         } else if (age >= 9 && age <= 13) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].nine_thirteen[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'nine_thirteen', column.name)
         } else if (age >= 14 && age <= 18) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].fourteen_eighteen[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'fourteen_eighteen', column.name)
         } else if (age >= 19 && age <= 30) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].nineteen_thirty[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'nineteen_thirty', column.name)
         } else if (age >= 31 && age <= 50) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].thirtyOne_fifty[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'thirtyOne_fifty', column.name)
         } else if (age >= 51 && age <= 70) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].fiftyOne_seventy[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'fiftyOne_seventy', column.name)
         } else if (age >= 71) {
-          this.diet[column.name].target.grams = this.getDRIs[sex].seventy_[column.name]
+          this.diet[column.name].target.grams = this.targetValue(sex, 'seventy_', column.name)
         }
       })
     },
+    targetValue (sex, ageRange, column) {
+      let value = this.getDRIs[sex][ageRange][column]
+      if (value === undefined || value === null) {
+        return 0
+      } else {
+        return value
+      }
+    },
     saveDiet () {
+      this.diet.updated = moment().format('ll')
+      db.collection('diets').doc(this.$route.params.dietId).set(this.diet)
+        .then(() => {
+          console.log('Diet saved')
+        })
+        .catch(err => {
+          console.error('Error saving diet', err)
+        })
       // Primeira vez que a dieta é salva localmente
-      if (this.diet.path === '') {
+      /* if (this.diet.path === '') {
         remote.dialog.showSaveDialog({
           filters: [{
             name: 'Diet files',
@@ -347,17 +363,29 @@ export default {
           if (err) throw err
           this.updateDiet(this.diet)
         })
-      }
+      } */
     }
   },
   created () {
+    db.collection('diets').doc(this.$route.params.dietId).get()
+      .then(doc => {
+        if (doc.exists) {
+          this.diet = doc.data()
+          this.diet.id = doc.id
+          this.updateDRI()
+        } else {
+          console.log('Diet doesnt exist')
+        }
+      }).catch(err => {
+        console.error('Error getting diet:', err)
+      })
     // Pegar caminho do arquivo temporário da dieta criada
-    fs.readFile(this.$route.params.dietPath, 'utf-8', (err, data) => {
+    /* .fs.readFile(this.$route.params.dietPath, 'utf-8', (err, data) => {
       if (err) throw err
       this.diet = JSON.parse(data)
       this.updateDRI()
       console.log('Read new diet')
-    })
+    }) */
   },
   computed: {
     ...mapGetters('composition', ['getTucunduva', 'getDRIs', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),

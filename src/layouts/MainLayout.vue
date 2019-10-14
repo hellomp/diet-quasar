@@ -90,8 +90,7 @@
         <q-item
           clickable
           v-ripple
-          to="/"
-          active
+          to="/diets"
         >
           <q-item-section avatar>
             <q-icon name="fas fa-utensils" />
@@ -103,7 +102,6 @@
           clickable
           v-ripple
           to="/compositions"
-          active
         >
           <q-item-section avatar>
             <q-icon name="fas fa-table" />
@@ -115,7 +113,6 @@
           clickable
           v-ripple
           to="/calculator"
-          active
         >
           <q-item-section avatar>
             <q-icon name="fas fa-calculator" />
@@ -154,13 +151,16 @@ export default {
   created () {
     this.setTucunduva()
     this.setDRIs()
-    this.setDiets()
+    // this.setDiets()
   }
 }
 </script>
 
 <style scoped>
+.menu-list {
+  padding: 8px;
+}
 .menu-list .q-item {
-  border-radius: 0 32px 32px 0;
+  border-radius: 32px;
 }
 </style>
