@@ -1,6 +1,10 @@
 export function getTucunduva (state) {
-  console.log('3. Get taco database')
+  console.log('3. Get Tucunduva database')
   return state.tucunduva
+}
+export function getIBGE (state) {
+  console.log('3. Get IBGE database')
+  return state.ibge
 }
 export function getDRIs (state) {
   return state.dris

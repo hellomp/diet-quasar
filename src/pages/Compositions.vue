@@ -2,7 +2,7 @@
   <q-page padding>
     <q-table
       title="Alimentos"
-      :data="getTucunduva"
+      :data="getIBGE"
       :columns="getColumnsNoQty"
       row-key="id"
       class="my-sticky-header-column-table"
@@ -35,7 +35,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('composition', ['getTucunduva', 'getColumnsNoQty'])
+    ...mapGetters('composition', ['getTucunduva', 'getIBGE', 'getColumnsNoQty'])
   }
 }
 </script>

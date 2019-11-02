@@ -1,5 +1,6 @@
 export default {
   tucunduva: [],
+  ibge: [],
   dris: {},
   columns: [
     {
@@ -18,6 +19,7 @@ export default {
     { name: 'lipid', label: 'Lip', field: row => row.lipid },
     { name: 'fiber', label: 'Fibra', unit: 'g', field: row => row.fiber },
     { name: 'sodium', label: 'Sódio', unit: 'mg', field: row => row.sodium },
+    { name: 'iron', label: 'Ferro', field: row => row.iron },
     { name: 'fatty_acids_poly', label: 'Á.G. Poli', field: row => row.fatty_acids_poly },
     { name: 'fatty_acids_mono', label: 'Á.G. Mono', field: row => row.fatty_acids_mono },
     { name: 'fatty_acids_sat', label: 'Á.G. Satu', field: row => row.fatty_acids_sat },

@@ -141,7 +141,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('composition', ['setTucunduva', 'setDRIs']),
+    ...mapActions('composition', ['setTucunduva', 'setIBGE', 'setDRIs']),
     ...mapActions('diets', ['setDiets']),
     ...mapActions('app', ['setSavingDiet', 'toggleResults', 'toggleExportDialog']),
     saveDiet () {
@@ -150,6 +150,7 @@ export default {
   },
   created () {
     this.setTucunduva()
+    this.setIBGE()
     this.setDRIs()
     // this.setDiets()
   }

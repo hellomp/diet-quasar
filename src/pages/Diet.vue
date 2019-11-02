@@ -35,6 +35,10 @@
         name="table"
         :myvalue="mealIndex"
         hide-bottom
+        :pagination.sync="pagination"
+        selection="multiple"
+        :selected.sync="selectedItems"
+        dense
       >
         <template v-slot:top-left>
           <q-input
@@ -42,16 +46,31 @@
             borderless
             debounce="100"
             v-model="meal.name"
-            class="text-h6"
+            class="text-subtitle1"
           >
           </q-input>
         </template>
         <template v-slot:top-right="props">
           <q-btn
             flat
-            label="Adicionar alimento"
+            round
+            size="sm"
+            icon="fas fa-trash"
+            color="red"
+            @click="deleteMeal(mealIndex)"
+          >
+            <q-tooltip>Excluir refeição</q-tooltip>
+          </q-btn>
+          <q-btn
+            flat
+            round
+            size="sm"
+            icon="fas fa-plus"
+            color="primary"
             @click="openModal(mealIndex)"
-          />
+          >
+            <q-tooltip>Adicionar alimento</q-tooltip>
+          </q-btn>
         </template>
         <template v-slot:body="props">
           <q-tr :props="props">
@@ -102,13 +121,35 @@
         @click="createMeal"
       />
     </div>
+
+    <q-page-sticky
+      position="bottom-right"
+      :offset="[18, 18]"
+    >
+      <q-btn
+        rounded
+        label="Excluir"
+        icon="fas fa-trash"
+        color="red"
+        size="sm"
+      />
+      <q-btn color="red">
+        <q-icon
+          left
+          size="sm"
+          name="fas fa-trash"
+        />
+        <div>Excluir</div>
+      </q-btn>
+    </q-page-sticky>
+
     <q-dialog
       v-model="addFoodDialog"
       full-width
     >
       <q-table
         title="Alimentos"
-        :data="getTucunduva"
+        :data="getIBGE"
         :columns="getColumnsNoQty"
         :visible-columns="diet.visibleColumns"
         row-key="id"
@@ -171,6 +212,9 @@ export default {
       selectedMealIndex: 0,
       addFoodDialog: false,
       searchString: null,
+      pagination: {
+        rowsPerPage: 0
+      },
       sexOptions: [
         {
           value: 'male',
@@ -224,6 +268,10 @@ export default {
       })
       this.cancelModal()
       this.updateMealTotals(this.selectedMealIndex)
+    },
+    deleteMeal (mealId) {
+      this.diet.meals.splice(mealId, 1)
+      this.updateDietTotals()
     },
     totalColumn (mealId, totalColumn) {
       let totalValue = ''
@@ -331,39 +379,6 @@ export default {
         .catch(err => {
           console.error('Error saving diet', err)
         })
-      // Primeira vez que a dieta é salva localmente
-      /* if (this.diet.path === '') {
-        remote.dialog.showSaveDialog({
-          filters: [{
-            name: 'Diet files',
-            extensions: ['json']
-          },
-          {
-            name: 'All files',
-            extensions: ['*']
-          }
-          ]
-        }, (fileName) => {
-          if (fileName === undefined) {
-            return
-          }
-          this.diet.path = fileName
-          this.diet.updated = moment().format('ll')
-          // Escrever dieta na pasta escolhida
-          fs.writeFile(fileName, JSON.stringify(this.diet), 'utf-8', (err) => {
-            if (err) throw err
-            this.addDiet(this.diet)
-          })
-        })
-        // Sobreescrever arquivo da dieta caso ele já exista
-      } else {
-        this.diet.updated = moment().format('ll')
-        console.log(this.diet.updated)
-        fs.writeFile(this.diet.path, JSON.stringify(this.diet), 'utf-8', (err) => {
-          if (err) throw err
-          this.updateDiet(this.diet)
-        })
-      } */
     }
   },
   created () {
@@ -379,16 +394,9 @@ export default {
       }).catch(err => {
         console.error('Error getting diet:', err)
       })
-    // Pegar caminho do arquivo temporário da dieta criada
-    /* .fs.readFile(this.$route.params.dietPath, 'utf-8', (err, data) => {
-      if (err) throw err
-      this.diet = JSON.parse(data)
-      this.updateDRI()
-      console.log('Read new diet')
-    }) */
   },
   computed: {
-    ...mapGetters('composition', ['getTucunduva', 'getDRIs', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),
+    ...mapGetters('composition', ['getTucunduva', 'getIBGE', 'getDRIs', 'getColumns', 'getColumnsNoQty', 'getColumnsNoDescQty']),
     ...mapState('app', ['savingDiet', 'showResults', 'showExportDialog'])
   },
   watch: {
@@ -410,6 +418,9 @@ export default {
 
 <style lang="scss">
 .my-sticky-header-column-table {
+  .q-field__native {
+    font-weight: 700;
+  }
   .q-table__top,
   .q-table__bottom,
   th:first-child, /* bg color is important for th; just specify one */

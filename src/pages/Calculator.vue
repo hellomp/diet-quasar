@@ -44,7 +44,7 @@
               <div class="col-3">
                 <q-input
                   outlined
-                  label="IMC"
+                  label="IMC (kg/m²)"
                   :value="bmi"
                   readonly
                 />
@@ -70,6 +70,51 @@
                   outlined
                   label="Peso Ajustado"
                   :value="adjustedWeight"
+                  readonly
+                />
+              </div>
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
+      <div class="col">
+        <q-card>
+          <q-card-section>
+            <div class="row q-col-gutter-xs">
+              <div class="col-4">
+                <q-input
+                  outlined
+                  label="Circunferência do Braço (cm)"
+                  v-model="armCircumference"
+                />
+              </div>
+              <div class="col-4">
+                <q-input
+                  outlined
+                  label="Prega Cutânea Tricipital (mm)"
+                  v-model="tricipitalSkinfold"
+                />
+              </div>
+              <div class="col-4">
+                <q-input
+                  outlined
+                  label="Circunferência da Cintura (cm)"
+                  v-model="waistCircumference"
+                />
+              </div>
+              <div class="col-4">
+                <q-input
+                  outlined
+                  label="Adequação CB (%)"
+                  v-model="armCircumferenceAdequation"
+                  readonly
+                />
+              </div>
+              <div class="col-4">
+                <q-input
+                  outlined
+                  label="Adequação PCT (%)"
+                  v-model="tricipitalSkinfoldAdequation"
                   readonly
                 />
               </div>
@@ -230,6 +275,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: 'Calculator',
   data () {
@@ -242,6 +289,9 @@ export default {
       age: 0,
       sexOptions: ['Masculino', 'Feminino'],
       sex: 'Masculino',
+      waistCircumference: 0,
+      armCircumference: 0,
+      tricipitalSkinfold: 0,
       macros: {
         carbohydrate: {
           gramature: 0,
@@ -269,12 +319,12 @@ export default {
       return this.macros[macroName] * this.actualWeight
     },
     updateCarbohydrate () {
-      this.macros.carbohydrate.grams = this.macros.carbohydrate.gramature * this.energyWeight
+      this.macros.carbohydrate.grams = _.round(this.macros.carbohydrate.gramature * this.energyWeight, 2)
       this.macros.carbohydrate.kcal = this.macros.carbohydrate.grams * 4
       this.macros.carbohydrate.perc = (this.macros.carbohydrate.kcal / this.energy) * 100
     },
     updateProtein () {
-      this.macros.protein.grams = this.macros.protein.gramature * this.energyWeight
+      this.macros.protein.grams = _.round(this.macros.protein.gramature * this.energyWeight, 2)
       this.macros.protein.kcal = this.macros.protein.grams * 4
       this.macros.protein.perc = (this.macros.protein.kcal / this.energy) * 100
     },
@@ -289,25 +339,43 @@ export default {
     idealWeight () {
       let heightSquare = this.height * this.height
       if (this.age > 64) {
-        return heightSquare * 23
+        return _.round(heightSquare * 23, 2)
       } else if (this.sex === 'Masculino') {
-        return heightSquare * 22
+        return _.round(heightSquare * 22, 2)
       } else {
-        return heightSquare * 21
+        return _.round(heightSquare * 21, 2)
       }
     },
     adjustedWeight () {
-      return (this.actualWeight + this.idealWeight) / 2
+      return _.round((this.actualWeight + this.idealWeight) / 2, 2)
     },
     energy () {
-      return this.energyWeight * this.kcalPerGram
+      return _.round(this.energyWeight * this.kcalPerGram, 2)
     },
     bmi () {
       let heightSquare = this.height * this.height
-      return this.actualWeight / heightSquare
+      return _.round(this.actualWeight / heightSquare, 2)
     },
     weightLost () {
       return (this.actualWeight / this.usualWeight) * 100
+    },
+    armCircumferenceAdequation () {
+      let result = 0
+      if (this.sex === 'Masculino') {
+        result = (this.armCircumference * 100) / 29.3
+      } else {
+        result = (this.armCircumference * 100) / 28.5
+      }
+      return _.round(result, 2)
+    },
+    tricipitalSkinfoldAdequation () {
+      let result = 0
+      if (this.sex === 'Masculino') {
+        result = (this.tricipitalSkinfold * 100) / 12.5
+      } else {
+        result = (this.tricipitalSkinfold * 100) / 16.5
+      }
+      return _.round(result, 2)
     }
   },
   watch: {
